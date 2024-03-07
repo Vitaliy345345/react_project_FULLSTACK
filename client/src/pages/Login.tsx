@@ -1,9 +1,11 @@
-import React from 'react';
+import { useState } from 'react';
 import { TextField, Button, Stack, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom';
 import { Paths } from '../paths';
 import PasswordTextField from '../UI/PasswordTextField';
+import { useLoginMutation, UserData } from '../store/services/auth';
+import { isErrorWithMessage } from '../utils/isErrorWithMessage';
 
 export interface FormLoginValues {
     email: string,
@@ -11,8 +13,10 @@ export interface FormLoginValues {
 }
 
 const Login = () => {
-
-    const form = useForm<FormLoginValues>({
+    const [loginUser, loginUserResult] = useLoginMutation()
+    const [error, setError] = useState('')
+    
+    const form = useForm<UserData>({
         defaultValues: {
             email: '',
             password: ''
@@ -23,8 +27,20 @@ const Login = () => {
 
     const { errors } = formState;
 
-    const onSubmit = (data: FormLoginValues) => {
+    const onSubmit = async (data: UserData) => {
         console.log(data)
+        try {
+            await loginUser(data).unwrap()
+
+        } catch (error) {
+            const maybeError = isErrorWithMessage(error)
+
+            if(maybeError) {
+                setError(error.data.message);
+            } else {
+                setError('Unknown error')
+            }
+        }
     }
 
     return (
