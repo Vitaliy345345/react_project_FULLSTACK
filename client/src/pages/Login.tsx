@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { TextField, Button, Stack, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Paths } from '../paths';
 import PasswordTextField from '../UI/PasswordTextField';
 import { useLoginMutation, UserData } from '../store/services/auth';
 import { isErrorWithMessage } from '../utils/isErrorWithMessage';
+import ErrorMessage from '../components/ErrorMessage';
 
 export interface FormLoginValues {
     email: string,
@@ -13,9 +14,10 @@ export interface FormLoginValues {
 }
 
 const Login = () => {
+    const navigate = useNavigate()
     const [loginUser, loginUserResult] = useLoginMutation()
     const [error, setError] = useState('')
-    
+
     const form = useForm<UserData>({
         defaultValues: {
             email: '',
@@ -31,11 +33,11 @@ const Login = () => {
         console.log(data)
         try {
             await loginUser(data).unwrap()
-
+            navigate('/')
         } catch (error) {
             const maybeError = isErrorWithMessage(error)
 
-            if(maybeError) {
+            if (maybeError) {
                 setError(error.data.message);
             } else {
                 setError('Unknown error')
@@ -80,11 +82,12 @@ const Login = () => {
                         helperText={errors.password?.message}
                     />
                     <Typography>
-                        If you don't have an account <Link style={{ textDecoration:'none' }} to={Paths.register}>Sign up</Link>
+                        If you don't have an account <Link style={{ textDecoration: 'none' }} to={Paths.register}>Sign up</Link>
                     </Typography>
                     <Button type='submit' variant='contained' color='success'>
                         Login
                     </Button>
+                    <ErrorMessage message={error} />
                 </Stack>
             </form>
         </>
