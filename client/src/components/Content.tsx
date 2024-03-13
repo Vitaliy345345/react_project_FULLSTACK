@@ -53,7 +53,7 @@ const Content = () => {
         list,
         filteredList,
         tasksList
-    } = useAppSelector(state => state.todos)
+    } = useAppSelector(state => state.todoLists)
 
     useLayoutEffect(() => {
         dispatch(todoFilterAll(null))

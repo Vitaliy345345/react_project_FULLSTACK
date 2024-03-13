@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Auth from './components/Auth';
 import Content from './components/Content';
+import ContentAPI from './components/ContentAPI';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
