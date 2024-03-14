@@ -7,11 +7,11 @@ const { prisma } = require('../prisma/prisma-client')
  */
 const getTodos = async (req, res) => {
     try {
-        const { userId } = req.body
+        const { id } = req.body
 
         const todos = await prisma.todoList.findMany({
             where: {
-                userId
+                userId: id
             }
         })
         return res.status(200).json(todos)
@@ -30,8 +30,7 @@ const add = async (req, res) => {
         const data = req.body;
 
 
-        if (!data.filter || !data.createTime) {
-            data.filter = 'all'
+        if (!data.createTime) {
             data.createTime = new Date().toLocaleString()
         }
 

@@ -14,8 +14,8 @@ interface Props {
     createTodoList: (title: string) => void
     color: string
     setColor: React.Dispatch<React.SetStateAction<string>>
-    setTodoDate: React.Dispatch<React.SetStateAction<Date | null>>
-    todoDate: Date | null
+    setTodoDate: React.Dispatch<React.SetStateAction<string | null>>
+    todoDate: string | null
 }
 
 const ModalWindowTodos = ({ openModal,

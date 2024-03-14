@@ -6,11 +6,13 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 interface DatePickerComponentPropType {
-    setTodoDate: React.Dispatch<React.SetStateAction<Date | null>>
-    todoDate: Date | null
+    setTodoDate: React.Dispatch<React.SetStateAction<string | null>>
+    todoDate: string | null
 }
 
 function DatePickerComponent({todoDate, setTodoDate }: DatePickerComponentPropType) {
+    
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
             <Stack spacing={2} sx={{ minWidth: 305 }}>

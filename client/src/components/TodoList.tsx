@@ -16,6 +16,8 @@ import { motion } from 'framer-motion';
 import DialogSubmit from './DialogSubmit';
 import EditMenu from './EditMenu';
 import { useAppSelector } from '../hook';
+import { useGetAllTasksQuery } from '../store/services/tasks';
+import { TaskList } from '@prisma/client';
 
 
 export type TaskType = {
@@ -27,7 +29,7 @@ export type TaskType = {
 interface PropsType {
     todoListId: string
     title: string
-    task: Array<TaskType>
+    task: TaskList[] | undefined
     removeTask: (taskId: string, todolistId: string) => void
     changeFilter: (value: filterValuesType, todoListId: string) => void
     createTask: (newTitle: string, todolistId: string) => void
@@ -36,15 +38,15 @@ interface PropsType {
     filter: filterValuesType
     removeTodolist: (todolistId: string) => void
     onChangeTodoListTitle: (newTitle: string, todoListId: string) => void
-    editHandler: (newTitle: string, newColor: string, newTodoDate: Date, todolistId: string) => void
+    editHandler: (newTitle: string, newColor: string, newTodoDate: string, todolistId: string) => void
     color: string
     setColor: React.Dispatch<React.SetStateAction<string>>
-    time: Date | null
-    todoDate: Date | null
-    setTodoDate: React.Dispatch<React.SetStateAction<Date | null>>
+    time: string | null
+    todoDate: string | null
+    setTodoDate: React.Dispatch<React.SetStateAction<string | null>>
     timeValue: string | null
     handleOpenDialog: () => void
-    createTime: Date
+    createTime: string
 }
 
 const TodoList = (props: PropsType) => {
@@ -53,6 +55,7 @@ const TodoList = (props: PropsType) => {
     const [anchorElEdit, setAnchorElEdit] = useState<null | HTMLElement>(null);
     const openInfo = Boolean(anchorElInfo);
     const openEdit = Boolean(anchorElEdit);
+    const { data, isLoading } = useGetAllTasksQuery();
 
     const onAllClickHandler = () => {
         props.changeFilter('all', props.todoListId)
@@ -69,9 +72,9 @@ const TodoList = (props: PropsType) => {
     const createTask = (title: string) => {
         props.createTask(title, props.todoListId)
     }
-    const onChangeTodoListTitle = (newTitle: string, newColor?: string, newTodoDate?: Date) => {
+    const onChangeTodoListTitle = (newTitle: string, newColor?: string, newTodoDate?: string) => {
         props.onChangeTodoListTitle(newTitle, props.todoListId)
-        if(newColor && newTodoDate){
+        if (newColor && newTodoDate) {
             props.editHandler(newTitle, newColor, newTodoDate, props.todoListId)
         }
     }
@@ -79,7 +82,7 @@ const TodoList = (props: PropsType) => {
     const shadowHandler = (): string | undefined => {
         if (!props.time) {
             return 'orange'
-        } else if (props.task.length === 0) {
+        } else if (props.task?.length === 0) {
             return 'grey'
         } else if (isTodoListCompleted(props.time, new Date(), props.task) === false) {
             return 'red'
@@ -89,9 +92,12 @@ const TodoList = (props: PropsType) => {
         return 'grey'
     }
     const deadlineHandler = () => {
-        if (props.task.length === 0) {
+        if (props.task?.length === 0) {
             return <Deadline time={props.time} />
-        } else if (props.task.every(t => t.isDone === true)) {
+        } else if (props.task?.every(t => {
+            const tIsDone = Boolean(t.isDone)
+            return tIsDone === true
+        })) {
             return <Typography sx={{ color: '#65B741' }} fontWeight={'bold'} fontSize={'20px'}>
                 COMPLETED
             </Typography>
@@ -187,8 +193,8 @@ const TodoList = (props: PropsType) => {
 
                                 <div style={{ margin: '20px 0 20px 0' }}>
                                     {
-                                        props.task.map(t => {
-                                            
+                                        props.task?.map(t => {
+                                            const tIsDone = Boolean(t.isDone);
                                             const onRemoveTaskHandler = () => {
                                                 props.removeTask(t.id, props.todoListId)
                                             }
@@ -199,12 +205,12 @@ const TodoList = (props: PropsType) => {
                                             const onChangeTaskTitle = (newTitle: string) => {
                                                 props.changeTaskTitle(t.id, newTitle, props.todoListId)
                                             }
-                                            
+
                                             const isTaskDoneBorder = (): string | undefined => {
                                                 if (!props.time) {
                                                     return 'green'
                                                 } else if (isTimeLeft(props.time, new Date())) {
-                                                    if (t.isDone === false) {
+                                                    if (tIsDone === false) {
                                                         return 'red'
                                                     } else return 'green'
                                                 }
@@ -227,7 +233,7 @@ const TodoList = (props: PropsType) => {
                                                     <Checkbox
                                                         key={t.id}
                                                         onChange={onChangeTaskIsDoneHandler}
-                                                        checked={t.isDone}
+                                                        checked={tIsDone}
                                                         color='success'
                                                         disabled={props.time ? isTimeLeft(props.time, new Date()) : false}
                                                     />

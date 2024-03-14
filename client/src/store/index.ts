@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { todoReducer } from './todoSlice'
 import auth from './authSlice'
 import todos from './todosSlice'
+import tasks from './tasksSlice'
 import { api } from './services/api';
 import { listenerMiddleware } from '../middleware/auth';
 
@@ -10,7 +11,8 @@ const store = configureStore({
         todoLists: todoReducer,
         [api.reducerPath]: api.reducer,
         auth,
-        todos
+        todos,
+        tasks
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware()
         .concat(api.middleware)

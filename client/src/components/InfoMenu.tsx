@@ -3,23 +3,26 @@ import { TaskType } from './TodoList'
 import { isTimeLeft } from '../utils/isTimeLeft'
 import styled from '@emotion/styled';
 import { darkGray, lightGreen } from '../constants';
+import { TaskList } from '@prisma/client';
 
 interface InfoMenuPropsType {
     open: boolean
     onClose: () => void
     anchorEl: HTMLElement | null
     title: string
-    deadline: Date | null
-    tasks: TaskType[]
-    createTime: Date
+    deadline: string | null
+    tasks: TaskList[] | undefined
+    createTime: string
 }
 
 const InfoMenu = ({ open, onClose, anchorEl, title, deadline, tasks, createTime }: InfoMenuPropsType) => {
     console.log(open)
 
     const tasksProgress = () => {
-        const completedTasks = tasks.filter(t => t.isDone)
-        return Math.round((completedTasks.length / tasks.length) * 100)
+        const completedTasks = tasks?.filter(t => t.isDone)
+        if( tasks && completedTasks ) {
+            return Math.round((completedTasks?.length / tasks?.length) * 100)
+        } else return null
     }
 
     const StyledDivider = styled(Divider)`
@@ -75,13 +78,13 @@ const InfoMenu = ({ open, onClose, anchorEl, title, deadline, tasks, createTime 
                 <StyledDivider />
 
                 <StyledTypography>
-                    Tasks count: {tasks.length > 0 ? tasks.length : 'no tasks'}
+                    Tasks count: {tasks && (tasks.length > 0 ? tasks?.length : 'no tasks')}
                 </StyledTypography>
 
                 <StyledDivider />
 
                 <StyledTypography>
-                    Progress: {tasks.length > 0 ? tasksProgress() : 0}%
+                    Progress: {tasks && (tasks.length > 0 ? tasksProgress() : 0)}%
                 </StyledTypography>
             </div>
         </Menu>

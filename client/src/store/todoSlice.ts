@@ -11,8 +11,8 @@ type TodosState = {
 
 const initialState: TodosState = {
     list: [
-        { id: todoListId1, title: 'What to learn', filter: 'all', color: '#3B5249', time: new Date('2023-10-12, 20:30:24'), createTime: new Date('2023-07-12, 20:30:24') },
-        { id: todoListId2, title: 'What to buy', filter: 'all', color: '#3B5249', time: new Date('2023-12-12, 17:00:00'), createTime: new Date('2023-08-12, 17:00:00') }
+        { id: todoListId1, title: 'What to learn', filter: 'all', color: '#3B5249', time: '2023-10-12, 20:30:24', createTime: new Date('2023-07-12, 20:30:24') },
+        { id: todoListId2, title: 'What to buy', filter: 'all', color: '#3B5249', time: '2023-12-12, 17:00:00', createTime: new Date('2023-08-12, 17:00:00') }
     ],
     tasksList: {
         [todoListId1]: [
@@ -34,7 +34,7 @@ const initialState: TodosState = {
 type CreateTodoPayloadTypes = {
     title: string,
     color: string,
-    todoDate: Date | null,
+    todoDate: string | null,
     tasksList: TasksStateType
 }
 
@@ -57,7 +57,7 @@ type todoEditHandlerPayloadTypes = {
     todolistId: string,
     newTitle: string,
     newColor: string,
-    newTodoDate: Date
+    newTodoDate: string
 }
 
 type todoChangeTitlePayloadTypes = {
@@ -113,7 +113,8 @@ const todoSlice = createSlice({
             const currentDate = new Date()
             state.filteredList = state.list.filter(tl => {
                 if (tl.time && action.payload.isTLCompleted(tl, action.payload.tasksObj) !== true) {
-                    return tl.time > currentDate
+                    const time = new Date(tl.time)
+                    return time > currentDate
                 }
                 else return null
             })
@@ -131,7 +132,8 @@ const todoSlice = createSlice({
             const currentDate = new Date()
             state.filteredList = state.list.filter(tl => {
                 if (tl.time && action.payload.isTLCompleted(tl, action.payload.tasksObj) !== true) {
-                    return tl.time < currentDate
+                    const time = new Date(tl.time)
+                    return time < currentDate
                 }
                 else return null
             })

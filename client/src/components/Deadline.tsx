@@ -4,13 +4,13 @@ import React from 'react';
 import { calculateTimeDifference} from '../utils/calculateTimeDifference';
 import {isTimeLeft} from '../utils/isTimeLeft'
 
-interface DeadlinePropsType {
-    time: Date | null
+interface Props {
+    time: string | null
 }
 
-const Deadline = ({ time }: DeadlinePropsType) => {
+const Deadline = ({ time }: Props) => {
 
-    const isTimeLeftColor = (targetDate: Date, currentDate: Date): string => {
+    const isTimeLeftColor = (targetDate: string, currentDate: Date): string => {
         if(!targetDate){
             return ''
         }else if (isTimeLeft(targetDate, currentDate) === true){

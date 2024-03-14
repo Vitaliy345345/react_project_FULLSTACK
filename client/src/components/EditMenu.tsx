@@ -4,20 +4,20 @@ import { darkGray } from '../constants';
 import ColorPicker from './ColorPicker';
 import DatePickerComponent from './DatePickerComponent';
 
-interface EditMenuPropsType {
+interface Props {
     open: boolean
     anchorEl: HTMLElement | null
     onClose: () => void
     title: string
-    onChange: (title: string, color: string, newTodoDate: Date) => void
+    onChange: (title: string, color: string, newTodoDate: string) => void
     color: string
-    time: Date | null
+    time: string | null
 }
 
-const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: EditMenuPropsType) => {
+const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: Props) => {
     const [newTitle, setNewTitle] = useState<string>('')
     const [newColor, setNewColor] = useState<string>('')
-    const [newTodoDate, setNewTodoDate] = useState<Date | null>(null)
+    const [newTodoDate, setNewTodoDate] = useState<string | null>(null)
 
     useEffect(() => {
         setNewTitle(title)

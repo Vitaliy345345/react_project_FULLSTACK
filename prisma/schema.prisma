@@ -21,7 +21,6 @@ model User {
 model TodoList {
   id              String @id @default(uuid())
   title           String
-  filter          String
   color           String
   time            String
   createTime      String

@@ -21,6 +21,11 @@ import {
     changeTaskStatusAction
 } from '../store/todoSlice'
 import TodoListSorting from './TodoListSorting';
+import { useGetAllTodosQuery } from '../store/services/todos';
+import { useGetAllTasksQuery } from '../store/services/tasks';
+import { TaskList, User } from '@prisma/client';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/authSlice';
 export type filterValuesType = "completed" | "active" | "all";
 export type btnDisplayType = 'none' | 'block';
 
@@ -29,7 +34,7 @@ export type TodoListType = {
     title: string,
     filter: filterValuesType
     color: string
-    time: Date | null
+    time: string | null
     createTime: Date
 }
 
@@ -47,6 +52,10 @@ export const isTLCompleted = (tl: TodoListType, tasksObj: TasksStateType): boole
 }
 
 const Content = () => {
+    const user = useSelector(selectUser)
+
+    const { data: dataTodos, isLoading: isLoadingTodos } = useGetAllTodosQuery()
+    const { data: dataTasks, isLoading: isLoadingTasks } = useGetAllTasksQuery()
     const dispatch = useAppDispatch();
 
     const {
@@ -60,7 +69,7 @@ const Content = () => {
     }, [list])
     const [openModal, setOpenModal] = useState(false);
     const [color, setColor] = useState('#382933');
-    const [todoDate, setTodoDate] = useState<Date | null>(null);
+    const [todoDate, setTodoDate] = useState<string | null>(null);
     const [timeValue, setTimeValue] = useState<string | null>(null);
     const [btnDisplay, setBtnDisplay] = useState<btnDisplayType | null>(null);
     const [openSnack, setOpenSnack] = useState<boolean>(false);
@@ -93,7 +102,7 @@ const Content = () => {
         dispatch(todoChangeTitle({ todolistId, newTitle }))
     }
 
-    const editHandler = (newTitle: string, newColor: string, newTodoDate: Date, todolistId: string) => {
+    const editHandler = (newTitle: string, newColor: string, newTodoDate: string, todolistId: string) => {
         dispatch(todoEditHandler({ todolistId, newTitle, newColor, newTodoDate }))
     }
 
@@ -131,26 +140,33 @@ const Content = () => {
                     <Container fixed>
                         <Grid container>
                             {
-                                filteredList.map(tl => {
-                                    let taskForTodoList = tasksList[tl.id]
-                                    if (tl.filter === 'completed') {
-                                        taskForTodoList = taskForTodoList.filter(t => t.isDone === true)
+                                dataTodos && dataTodos.map(dTodos => {
+                                    let taskForTodoList: TaskList[] | undefined = dataTasks?.filter(dTasks => dTodos.id === dTasks.todoId)
+
+                                    if (dTodos.filter === 'completed') {
+                                        taskForTodoList = taskForTodoList?.filter(t => {
+                                            const tIsDone = Boolean(t.isDone);
+                                            return tIsDone === true
+                                        })
                                     }
 
-                                    if (tl.filter === 'active') {
-                                        taskForTodoList = taskForTodoList.filter(t => t.isDone === false)
+                                    if (dTodos.filter === 'active') {
+                                        taskForTodoList = taskForTodoList?.filter(t => {
+                                            const tIsDone = Boolean(t.isDone);
+                                            return tIsDone === false
+                                        })
                                     }
 
                                     return (
                                         <Grid item margin={'26px'}>
                                             <TodoList
-                                                key={tl.id}
-                                                todoListId={tl.id}
-                                                title={tl.title}
-                                                color={tl.color}
+                                                key={dTodos.id}
+                                                todoListId={dTodos.id}
+                                                title={dTodos.title}
+                                                color={dTodos.color}
                                                 setColor={setColor}
-                                                time={tl.time}
-                                                createTime={tl.createTime}
+                                                time={dTodos.time}
+                                                createTime={dTodos.createTime}
                                                 timeValue={timeValue}
                                                 todoDate={todoDate}
                                                 setTodoDate={setTodoDate}
@@ -159,7 +175,7 @@ const Content = () => {
                                                 changeFilter={changeFilter}
                                                 createTask={createTask}
                                                 changeTaskStatus={changeTaskStatus}
-                                                filter={tl.filter}
+                                                filter={dTodos.filter}
                                                 removeTodolist={removeTodoList}
                                                 changeTaskTitle={changeTaskTitle}
                                                 onChangeTodoListTitle={onChangeTodoListTitle}
