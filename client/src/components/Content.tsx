@@ -52,8 +52,6 @@ export const isTLCompleted = (tl: TodoListType, tasksObj: TasksStateType): boole
 }
 
 const Content = () => {
-    const user = useSelector(selectUser)
-
     const { data: dataTodos, isLoading: isLoadingTodos } = useGetAllTodosQuery()
     const { data: dataTasks, isLoading: isLoadingTasks } = useGetAllTasksQuery()
     const dispatch = useAppDispatch();
@@ -138,6 +136,7 @@ const Content = () => {
             <AnimatePresence>
                 <div className="container">
                     <Container fixed>
+                        {isLoadingTodos && <h1> Loading... </h1>}
                         <Grid container>
                             {
                                 dataTodos && dataTodos.map(dTodos => {

@@ -7,7 +7,7 @@ type todosApiType = TodoList & { filter: filterValuesType }
 export const todosApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getAllTodos: builder.query<todosApiType[], void>({
-            query: (user) => ({
+            query: () => ({
                 url: `/todos`,
                 method: 'GET',
             })

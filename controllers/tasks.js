@@ -11,7 +11,8 @@ const getTasks = async (req, res) => {
 
         const tasks = await prisma.taskList.findMany({
             where: {
-                todoId
+                todoId,
+                userId: req.user.id
             }
         })
 
@@ -42,7 +43,8 @@ const add = async (req, res) => {
         const task = await prisma.taskList.create({
             data: {
                 ...data,
-                todoId: id
+                todoId: id,
+                userId: req.user.id
             }
         })
 

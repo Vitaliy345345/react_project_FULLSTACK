@@ -7,7 +7,7 @@ const { prisma } = require('../prisma/prisma-client')
  */
 const getTodos = async (req, res) => {
     try {
-        const { id } = req.body
+        const id = req.user.id
 
         const todos = await prisma.todoList.findMany({
             where: {
