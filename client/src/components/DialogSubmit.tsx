@@ -4,10 +4,11 @@ import React from 'react';
 interface DialogSubmitPropsType {
     open: boolean
     onClose: () => void
-    removeTodoList: () => void
+    removeTodoList: (id: string) => void
+    todoId: string
 }
 
-const DialogSubmit = ({ open, onClose, removeTodoList }: DialogSubmitPropsType) => {
+const DialogSubmit = ({ open, onClose, removeTodoList, todoId }: DialogSubmitPropsType) => {
 
     return (
         <Dialog open={open} onClose={onClose} PaperProps={{
@@ -25,7 +26,7 @@ const DialogSubmit = ({ open, onClose, removeTodoList }: DialogSubmitPropsType) 
             </DialogContent>
             <DialogActions>
                 <Button style={{ borderRadius: '20px' }} variant='outlined' color='success' onClick={onClose}>Cancel</Button>
-                <Button style={{ borderRadius: '20px' }} variant='outlined' color='success' onClick={removeTodoList} autoFocus>
+                <Button style={{ borderRadius: '20px' }} variant='outlined' color='success' onClick={() => removeTodoList(todoId)} autoFocus>
                     Agree
                 </Button>
             </DialogActions>

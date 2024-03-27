@@ -58,7 +58,7 @@ const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: Pro
                     onChange={onChangeTitleHandler}
                 />
                 <ColorPicker color={newColor} setColor={setNewColor} textColor='white'/>
-                <DatePickerComponent todoDate={newTodoDate} setTodoDate={setNewTodoDate} />
+                <DatePickerComponent/>
                 <Button
                     variant='contained'
                     color='success'

@@ -17,6 +17,7 @@ const Deadline = ({ time }: Props) => {
             return '#F15A59'
         }else return '#BED754'
     }
+    console.log(time && new Date(time))
 
     return (
         time
@@ -27,13 +28,13 @@ const Deadline = ({ time }: Props) => {
                     className='paper__header--time'
                 >
                     <AccessAlarm />
-                    {`${time ? new Date(time).toLocaleString() : ''}`}
+                    {`${time && new Date(time).toLocaleString()}`}
                 </Typography>
                 <Typography
                     color={isTimeLeftColor(time, new Date())}
                     className='paper__header--time'
                 >
-                    {`${time ? calculateTimeDifference(new Date(time)) : ''}`}
+                    {`${time && calculateTimeDifference(new Date(time))}`}
                 </Typography>
             </div>
             :

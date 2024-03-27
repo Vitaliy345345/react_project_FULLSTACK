@@ -34,7 +34,11 @@ const add = async (req, res) => {
             data.createTime = new Date().toLocaleString()
         }
 
-        if (!data.title || !data.color || !data.time) {
+        if(!data.color) {
+            data.color = '#382933'
+        }
+
+        if (!data.title || !data.time) {
             return res.status(400).json({ message: 'Fill all fields' })
         }
 

@@ -36,7 +36,7 @@ const ModalWindow = ({ openModal,
                         createItem={createTodoList}
                     />
                     <ColorPicker color={color} setColor={setColor} textColor='black' />
-                    <DatePickerComponent todoDate={todoDate} setTodoDate={setTodoDate} />
+                    <DatePickerComponent/>
                 </div>
             </div>
         </div>

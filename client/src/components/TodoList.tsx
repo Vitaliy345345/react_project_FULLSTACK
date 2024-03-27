@@ -18,6 +18,8 @@ import EditMenu from './EditMenu';
 import { useAppSelector } from '../hook';
 import { useGetAllTasksQuery } from '../store/services/tasks';
 import { TaskList } from '@prisma/client';
+import { useRemoveTodoMutation } from '../store/services/todos';
+import { isErrorWithMessage } from '../utils/isErrorWithMessage';
 
 
 export type TaskType = {
@@ -53,6 +55,8 @@ const TodoList = (props: PropsType) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false)
     const [anchorElInfo, setAnchorElInfo] = useState<null | HTMLElement>(null);
     const [anchorElEdit, setAnchorElEdit] = useState<null | HTMLElement>(null);
+    const [error, setError] = useState('')
+    const [removeTodo, removeTodoResult] = useRemoveTodoMutation()
     const openInfo = Boolean(anchorElInfo);
     const openEdit = Boolean(anchorElEdit);
     const { data, isLoading } = useGetAllTasksQuery();
@@ -66,8 +70,19 @@ const TodoList = (props: PropsType) => {
     const onActiveClickHandler = () => {
         props.changeFilter('active', props.todoListId)
     }
-    const removeTodoList = () => {
-        props.removeTodolist(props.todoListId)
+    const removeTodoList = async (id: string) => {
+        try {
+            await removeTodo(id).unwrap()
+        } catch (error) {
+            const maybeError = isErrorWithMessage(error)
+
+            if (maybeError) {
+                setError(error.data.message);
+            } else {
+                setError('Unknown error')
+            } 
+        }
+
     }
     const createTask = (title: string) => {
         props.createTask(title, props.todoListId)
@@ -293,6 +308,7 @@ const TodoList = (props: PropsType) => {
                                     open={openDialog}
                                     onClose={handleDialogClickClose}
                                     removeTodoList={removeTodoList}
+                                    todoId={props.todoListId}
                                 />
                             </div>
                         </AccordionDetails>

@@ -19,4 +19,5 @@ export const api = createApi({
     baseQuery: baseQueryWithRetry,
     refetchOnMountOrArgChange: true,
     endpoints: () => ({}),
+    tagTypes: ['Todo']
 })

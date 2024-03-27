@@ -36,6 +36,6 @@ model TaskList {
   isDone          String        @default("false")
   todoList        TodoList      @relation(fields: [todoId], references: [id])
   todoId          String
-  user            User?          @relation(fields: [userId], references: [id])
-  userId          String?
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
 }

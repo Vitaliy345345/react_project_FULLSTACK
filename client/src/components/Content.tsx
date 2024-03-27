@@ -26,6 +26,7 @@ import { useGetAllTasksQuery } from '../store/services/tasks';
 import { TaskList, User } from '@prisma/client';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../store/authSlice';
+import ModalWindowTodos from './ModalWindowTodos';
 export type filterValuesType = "completed" | "active" | "all";
 export type btnDisplayType = 'none' | 'block';
 
@@ -200,7 +201,7 @@ const Content = () => {
                                 }} />
                             </button>
                         </Grid>
-                        <ModalWindow
+                        <ModalWindowTodos
                             color={color}
                             setColor={setColor}
                             openModal={openModal}

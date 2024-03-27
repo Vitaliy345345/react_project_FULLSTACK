@@ -1,8 +1,8 @@
-import { TodoList, User } from "@prisma/client";
+import { TodoList} from "@prisma/client";
 import { filterValuesType } from "../../components/Content";
 import { api } from "./api";
 
-type todosApiType = TodoList & { filter: filterValuesType }
+export type todosApiType = TodoList & { filter: filterValuesType }
 
 export const todosApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -10,7 +10,8 @@ export const todosApi = api.injectEndpoints({
             query: () => ({
                 url: `/todos`,
                 method: 'GET',
-            })
+            }),
+            providesTags: result => ['Todo']
         }),
         editTodo: builder.mutation<string, todosApiType>({
             query: (todo) => ({
@@ -23,14 +24,16 @@ export const todosApi = api.injectEndpoints({
                 url: `/todos/remove/${id}`,
                 method: 'POST',
                 body: { id }
-            })
+            }),
+            invalidatesTags: ['Todo']
         }),
         addTodo: builder.mutation<todosApiType, todosApiType>({
-            query: (todo) => ({
+            query: (todosApiType) => ({
                 url: `/todos/add`,
                 method: 'POST',
-                body: { todo }
-            })
+                body: todosApiType
+            }),
+            invalidatesTags: ['Todo']
         }),
 
     })

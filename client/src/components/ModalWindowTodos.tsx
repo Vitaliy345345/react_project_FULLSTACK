@@ -4,9 +4,12 @@ import AddItemForm from './AddItemForm';
 import DatePickerComponent from './DatePickerComponent';
 
 import ColorPicker from './ColorPicker';
-import { TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { UserData } from '../store/services/auth';
+import { useAddTodoMutation } from '../store/services/todos';
+import { filterValuesType } from './Content';
+import { isErrorWithMessage } from '../utils/isErrorWithMessage';
+import ErrorMessage from './ErrorMessage';
 
 interface Props {
     setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -18,6 +21,16 @@ interface Props {
     todoDate: string | null
 }
 
+export interface FormTodoValues {
+    id: string,
+    title: string,
+    color: string,
+    time: string,
+    createTime: string,
+    filter: filterValuesType,
+    userId: string
+}
+
 const ModalWindowTodos = ({ openModal,
     setOpenModal,
     createTodoList,
@@ -26,20 +39,35 @@ const ModalWindowTodos = ({ openModal,
     setTodoDate,
     todoDate,
 }: Props) => {
-    
-    const form = useForm<UserData>({
+
+    const form = useForm<FormTodoValues>({
         defaultValues: {
-            email: '',
-            password: ''
+            title: '',
+            color: '',
+            time: ''
         }
     })
 
-    const { register, handleSubmit, formState } = form;
+    const [error, setError] = useState('')
+
+    const [addTodo, addTodoResult] = useAddTodoMutation()
+
+    const { register, handleSubmit, formState, control } = form;
 
     const { errors } = formState;
 
-    const onSubmit = () => {
+    const onSubmit = async (data: FormTodoValues) => {
+        try {
+            await addTodo(data).unwrap()
+        } catch (error) {
+            const maybeError = isErrorWithMessage(error)
 
+            if (maybeError) {
+                setError(error.data.message);
+            } else {
+                setError('Unknown error')
+            }
+        }
     }
 
     return (
@@ -48,11 +76,19 @@ const ModalWindowTodos = ({ openModal,
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <h2>Create todo</h2>
                     <div>
-                        <TextField 
-
+                        <TextField
+                            label='title'
+                            type='title'
+                            {
+                            ...register('title')
+                            }
                         />
-                        <ColorPicker color={color} setColor={setColor} textColor='black' />
-                        <DatePickerComponent todoDate={todoDate} setTodoDate={setTodoDate} />
+                        <ColorPicker control={control} color={color} setColor={setColor} textColor='black' />
+                        <DatePickerComponent control={control}/>
+                        <Button type='submit' variant='contained' color='success'>
+                            Add
+                        </Button>
+                        <ErrorMessage message={error} />
                     </div>
                 </form>
             </div>

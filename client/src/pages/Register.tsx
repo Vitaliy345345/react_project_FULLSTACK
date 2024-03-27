@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextField, Button, Stack, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Paths } from '../paths';
+import { useRegisterMutation } from '../store/services/auth';
+import { isErrorWithMessage } from '../utils/isErrorWithMessage';
+import ErrorMessage from '../components/ErrorMessage';
 
 interface FormRegisterValues {
     email: string,
@@ -19,12 +22,29 @@ const Register = () => {
         }
     })
 
+    const navigate = useNavigate()
+
+    const [error, setError] = useState('')
+
+    const [ registerUser, registerResult ] = useRegisterMutation()
+
     const { register, handleSubmit, formState } = form;
 
     const { errors } = formState;
 
-    const onSubmit = (data: FormRegisterValues) => {
-        console.log(data)
+    const onSubmit = async (data: FormRegisterValues) => {
+        try {
+            await registerUser(data).unwrap()
+            navigate('/')
+        } catch (error) {
+            const maybeError = isErrorWithMessage(error)
+
+            if (maybeError) {
+                setError(error.data.message);
+            } else {
+                setError('Unknown error')
+            }
+        }
     }
 
     return (
@@ -78,6 +98,7 @@ const Register = () => {
                     <Button type='submit' variant='contained' color='success'>
                         Sign up
                     </Button>
+                    <ErrorMessage message={error} />
                 </Stack>
             </form>
         </>
