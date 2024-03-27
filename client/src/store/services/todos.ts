@@ -1,4 +1,5 @@
-import { TodoList} from "@prisma/client";
+import { MediaBluetoothOnOutlined } from "@mui/icons-material";
+import { TodoList } from "@prisma/client";
 import { filterValuesType } from "../../components/Content";
 import { api } from "./api";
 
@@ -13,14 +14,25 @@ export const todosApi = api.injectEndpoints({
             }),
             providesTags: result => ['Todo']
         }),
+        getOneTodo: builder.query<todosApiType, string>({
+            query: (id) => ({
+                url: `/todos/${id}`,
+                method: 'GET',
+                params: {
+                    id
+                }
+            })
+        }),
         editTodo: builder.mutation<string, todosApiType>({
             query: (todo) => ({
                 url: `/todos/edit/${todo.id}`,
-                method: 'PUT'
-            })
+                method: 'PUT',
+                body: todo
+            }),
+            invalidatesTags: ['Todo']
         }),
         removeTodo: builder.mutation<string, string>({
-            query: (id) => ({
+            query: ( id ) => ({
                 url: `/todos/remove/${id}`,
                 method: 'POST',
                 body: { id }
@@ -43,12 +55,14 @@ export const {
     useAddTodoMutation,
     useEditTodoMutation,
     useGetAllTodosQuery,
-    useRemoveTodoMutation
+    useRemoveTodoMutation,
+    useGetOneTodoQuery
 } = todosApi;
 
 export const {
     addTodo,
     editTodo,
     removeTodo,
-    getAllTodos
+    getAllTodos,
+    getOneTodo
 } = todosApi.endpoints;

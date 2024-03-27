@@ -21,6 +21,26 @@ const getTodos = async (req, res) => {
 }
 
 /**
+ * @route GET /api/todos/:id
+ * @desc get todo
+ * @access Private
+ */
+const getOneTodo = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const todo = await prisma.todoList.findUnique({
+            where: {
+                id
+            }
+        })
+        return res.status(200).json(todo)
+    } catch (error) {
+        res.status(400).json({ message: 'Failed to get todo' })
+    }
+}
+
+/**
  * @route POST /api/todos/add
  * @desc add todo
  * @access Private
@@ -34,7 +54,7 @@ const add = async (req, res) => {
             data.createTime = new Date().toLocaleString()
         }
 
-        if(!data.color) {
+        if (!data.color) {
             data.color = '#382933'
         }
 
@@ -101,6 +121,7 @@ const edit = async (req, res) => {
 
 module.exports = {
     getTodos,
+    getOneTodo,
     add,
     remove,
     edit

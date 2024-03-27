@@ -294,6 +294,7 @@ const TodoList = (props: PropsType) => {
                                     onChange={onChangeTodoListTitle}
                                     color={props.color}
                                     time={props.time}
+                                    todoId={props.todoListId}
                                 />
                                 <InfoMenu
                                     tasks={props.task}

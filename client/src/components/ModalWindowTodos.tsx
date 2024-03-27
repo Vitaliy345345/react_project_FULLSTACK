@@ -78,10 +78,14 @@ const ModalWindowTodos = ({ openModal,
                     <div>
                         <TextField
                             label='title'
-                            type='title'
+                            type='text'
                             {
-                            ...register('title')
+                            ...register('title', {
+                                required: 'Title is required'
+                            })
                             }
+                            error={!!errors.title}
+                            helperText={errors.title?.message}
                         />
                         <ColorPicker control={control} color={color} setColor={setColor} textColor='black' />
                         <DatePickerComponent control={control}/>

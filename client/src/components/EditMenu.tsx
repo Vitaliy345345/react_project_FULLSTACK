@@ -1,8 +1,13 @@
 import { Button, Menu, TextField, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { darkGray } from '../constants';
+import { useEditTodoMutation, useGetOneTodoQuery } from '../store/services/todos';
+import { isErrorWithMessage } from '../utils/isErrorWithMessage';
 import ColorPicker from './ColorPicker';
 import DatePickerComponent from './DatePickerComponent';
+import ErrorMessage from './ErrorMessage';
+import { FormTodoValues } from './ModalWindowTodos';
 
 interface Props {
     open: boolean
@@ -12,12 +17,16 @@ interface Props {
     onChange: (title: string, color: string, newTodoDate: string) => void
     color: string
     time: string | null
+    todoId: string
 }
 
-const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: Props) => {
+const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time, todoId }: Props) => {
     const [newTitle, setNewTitle] = useState<string>('')
     const [newColor, setNewColor] = useState<string>('')
+    const [error, setError] = useState<string>('')
     const [newTodoDate, setNewTodoDate] = useState<string | null>(null)
+    const { data, isLoading } = useGetOneTodoQuery(todoId || '')
+    const [editTodo, editTodoResult] = useEditTodoMutation()
 
     useEffect(() => {
         setNewTitle(title)
@@ -28,12 +37,41 @@ const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: Pro
     const onChangeTitleHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewTitle(event.target.value)
     }
-    const onClickConfirmHandler = () => {
-        if(newTodoDate){
-            onChange(newTitle, newColor, newTodoDate)
+    const onClickConfirmHandler = () => onClose()
+
+
+
+    const form = useForm<FormTodoValues>({
+        defaultValues: {
+            title: '',
+            color: '',
+            time: ''
         }
-        onClose()
+    })
+
+    const { register, handleSubmit, formState, control } = form
+
+    const { errors } = formState
+
+    const onSubmit = async (todo: FormTodoValues) => {
+        try {
+            const editedTodo = {
+                ...data,
+                ...todo
+            }
+            console.log(todoId)
+            await editTodo(editedTodo).unwrap()
+        } catch (error) {
+            const maybeError = isErrorWithMessage(error)
+
+            if (maybeError) {
+                setError(error.data.message);
+            } else {
+                setError('Unknown error')
+            }
+        }
     }
+
     return (
         <Menu
             open={open}
@@ -49,25 +87,36 @@ const EditMenu = ({ open, onClose, anchorEl, title, onChange, color, time }: Pro
                 <Typography color='white'>
                     Edit
                 </Typography>
-                <TextField
-                    variant='filled'
-                    color='success'
-                    label='title'
-                    inputProps={{ style: { color: "white" } }}
-                    value={newTitle}
-                    onChange={onChangeTitleHandler}
-                />
-                <ColorPicker color={newColor} setColor={setNewColor} textColor='white'/>
-                <DatePickerComponent/>
-                <Button
-                    variant='contained'
-                    color='success'
-                    onClick={onClickConfirmHandler}
-                    fullWidth
-                >
-                    Confirm
-                </Button>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <TextField
+                        variant='filled'
+                        color='success'
+                        label='title'
+                        inputProps={{ style: { color: "white" } }}
+                        value={newTitle}
+                        {
+                        ...register('title', {
+                            required: 'Title is required'
+                        })
+                        }
+                        error={!!errors.title}
+                        helperText={errors.title?.message}
+                        onChange={onChangeTitleHandler}
+                    />
+                    <ColorPicker control={control} color={newColor} setColor={setNewColor} textColor='white' />
+                    <DatePickerComponent control={control} />
+                    <Button
+                        type='submit'
+                        variant='contained'
+                        color='success'
+                        fullWidth
+                        onClick={onClickConfirmHandler}
+                    >
+                        Confirm
+                    </Button>
+                </form>
             </div>
+            <ErrorMessage message={error} />
         </Menu>
     );
 };
